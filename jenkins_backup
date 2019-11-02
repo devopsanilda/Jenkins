@@ -1,0 +1,16 @@
+JENKINS_HOME=/var/lib/jenkins
+JENKINS_BACKUP_HOME=/var/lib/jenkins/jenkins_backup
+JENKINS_BACKUP_FILE=$(date +"%Y-%m-%d_%H-%M-%S").tar.gz
+JENKINS_JOBS_BACKUP_FILE=$(date +"%Y-%m-%d_%H-%M-%S")_jobs.tar.gz
+
+#Backup All Configurations
+cd $JENKINS_HOME
+tar zcvf $JENKINS_BACKUP_HOME/$JENKINS_BACKUP_FILE $JENKINS_HOME/* --exclude=*/workspace --exclude=*/modules --exclude=*/outOfOrderBuilds --exclude=*/builds  --exclude=*/caches --exclude=*/log --exclude=*/logs > /dev/null
+
+#Backup Only Job Configurations
+cd $JENKINS_BACKUP_HOME
+find $JENKINS_HOME/jobs/ -type f -name "config.xml" > files.txt
+tar zcvf $JENKINS_BACKUP_HOME/$JENKINS_JOBS_BACKUP_FILE -T files.txt > /dev/null
+
+smbclient -U "DOMAIN/USER%$PASSWORD" //server01/e$ -c "cd BackupJenkins;put $JENKINS_BACKUP_FILE $JENKINS_JOBS_BACKUP_FILE"
+find $JENKINS_BACKUP_HOME/*.tar.gz -mtime +15 -exec rm -f {} \;
