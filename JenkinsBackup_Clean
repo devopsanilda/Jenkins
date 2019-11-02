@@ -1,0 +1,8 @@
+#Initialize variables
+$localPath = "e:\BackupJenkins"
+
+#Clean old backups
+echo "Cleaning old backups..."
+Get-ChildItem "$localPath\" | Where CreationTime -lt  (Get-Date).AddDays(-15)  | Remove-Item -Force -Recurse
+
+exit 0
